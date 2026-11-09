@@ -8,7 +8,7 @@ export function verifyTelnyxWebhook({ rawBody, headers, publicKeyBase64, nowMs =
   const signatureBase64 = headers['telnyx-signature-ed25519'];
   const timestamp = headers['telnyx-timestamp'];
   if (typeof signatureBase64 !== 'string' || typeof timestamp !== 'string') return { valid: false, reason: 'Missing Telnyx signature headers.' };
-  if (!/^\\d{10}$/.test(timestamp)) return { valid: false, reason: 'Invalid Telnyx timestamp.' };
+  if (!/^\d{10}$/.test(timestamp)) return { valid: false, reason: 'Invalid Telnyx timestamp.' };
   const timestampSeconds = Number(timestamp);
   if (!Number.isSafeInteger(timestampSeconds) || Math.abs(Math.floor(nowMs / 1000) - timestampSeconds) > MAX_CLOCK_SKEW_SECONDS) return { valid: false, reason: 'Webhook timestamp is outside the five-minute acceptance window.' };
   const rawKey = Buffer.from(publicKeyBase64, 'base64');
