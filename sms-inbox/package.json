@@ -1,0 +1,15 @@
+{
+  "name": "private-sms-inbox",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A private, single-user inbox for SMS delivered to a phone number you own through Telnyx webhooks.",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node --env-file=.env src/server.js",
+    "start:dev": "node --watch --env-file=.env src/server.js",
+    "test": "node --test"
+  }
+}
