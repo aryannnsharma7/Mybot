@@ -20,10 +20,10 @@ const MAX_BODY_BYTES = 512 * 1024;
 const issues = [];
 if (!USERNAME.trim()) issues.push('DASHBOARD_USER is required.');
 if (PASSWORD.length < 20) issues.push('DASHBOARD_PASSWORD must be at least 20 characters.');
-if (!/^\\+[1-9]\\d{7,14}$/.test(OWNED_NUMBER)) issues.push('OWNED_NUMBER must be your assigned E.164 number.');
+if (!/^\+[1-9]\d{7,14}$/.test(OWNED_NUMBER)) issues.push('OWNED_NUMBER must be your assigned E.164 number.');
 if (Buffer.from(TELNYX_PUBLIC_KEY, 'base64').length !== 32) issues.push('TELNYX_PUBLIC_KEY must be the 32-byte base64 Ed25519 public key from Telnyx.');
 if (!Number.isFinite(RETENTION_HOURS) || RETENTION_HOURS < 1 || RETENTION_HOURS > 168) issues.push('RETENTION_HOURS must be between 1 and 168.');
-if (issues.length) { console.error('Configuration error:\\n- ' + issues.join('\\n- ')); process.exit(1); }
+if (issues.length) { console.error('Configuration error:\n- ' + issues.join('\n- ')); process.exit(1); }
 
 mkdirSync(dirname(DATABASE_PATH), { recursive: true });
 const db = new DatabaseSync(DATABASE_PATH);
@@ -50,7 +50,7 @@ function handleInbound(event) {
   const payload=event?.data?.payload; if (!payload || (payload.direction && payload.direction !== 'inbound')) return { accepted:true, stored:false, reason:'Ignored non-inbound payload.' };
   const from=payload?.from?.phone_number; const destinations=Array.isArray(payload?.to)?payload.to:[];
   const owned=destinations.some(item=>item?.phone_number===OWNED_NUMBER); const text=typeof payload?.text==='string'?payload.text:''; const id=payload?.id||event?.data?.id;
-  if (!owned || !/^\\+[1-9]\\d{7,14}$/.test(from||'') || !id) return { accepted:true, stored:false, reason:'Message did not match the configured owned number.' };
+  if (!owned || !/^\+[1-9]\d{7,14}$/.test(from||'') || !id) return { accepted:true, stored:false, reason:'Message did not match the configured owned number.' };
   if (!text || text.length>5000) return { accepted:true, stored:false, reason:'Empty or oversized SMS body.' };
   const received=payload.received_at||event?.data?.occurred_at||new Date().toISOString();
   const result=insertMessage.run(String(id),from,OWNED_NUMBER,text,String(received),Date.now());
